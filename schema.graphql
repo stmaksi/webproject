@@ -3,6 +3,7 @@ directive @auth(roleNames: [UserRole!]) on OBJECT | FIELD_DEFINITION
 directive @user on OBJECT | FIELD_DEFINITION
 
 # queries
+#12, 14, 17, 20, 25, 30, 37, 40, 43, 48, 50, 55, 61, 70
 
 type Query {
     userGetUserLogined: UserLogined! @auth
