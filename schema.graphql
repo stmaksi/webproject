@@ -1,0 +1,1002 @@
+# directives
+directive @auth(roleNames: [UserRole!]) on OBJECT | FIELD_DEFINITION
+directive @user on OBJECT | FIELD_DEFINITION
+
+# queries
+
+type Query {
+    userGetUserLogined: UserLogined! @auth
+    userGetUser(data: UserGetUserPayload!): User! @auth(roleNames: [ADMIN])
+    userGetUsers(data: UserGetUsersPayload!): Users! @auth(roleNames: [ADMIN])
+    userGetUserEvents(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [ADMIN])
+    userGetUsersEvents(data: UserGetUsersEventsPayload!): UsersEvents! @auth(roleNames: [ADMIN])
+
+    brandGetBrandUser: BrandUser! @auth
+
+    documentGetDocumentContent(data: DocumentGetDocumentContentPayload!): DocumentContent!
+    documentGetDocumentsUser: [DocumentUser!]! @auth
+
+    marketingLevelGetLevelsUser: MarketingLevelsUser! @auth
+
+    marketingModuleGetModulesUser(data: MarketingModuleGetModulesUserPayload): MarketingModuleUserModules! @auth
+    marketingModuleGetModulesUserRoadmap: MarketingModuleUserModules! @auth
+    marketingModuleGetCheckpointsUser(data: MarketingModuleGetCheckpointsUserPayload): MarketingModulesUser! @auth(roleNames: [ADMIN])
+    marketingModuleGetModulesUserData: MarketingModulesGetUserDataResult! @auth
+    marketingModuleGetModuleUser(data: MarketingModuleGetModuleUserPayload!): MarketingModuleUserModule! @auth
+
+    marketingModuleGetModules(data: MarketingModuleGetModulesPayload!): MarketingModules! @auth(roleNames: [ADMIN])
+    marketingModuleGetModule(data: MarketingModuleGetModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
+    marketingModuleGetModuleSyncLogs: MarketingModuleSyncLogs! @auth(roleNames: [ADMIN])
+    marketingModuleGetModulesBlocks(data: MarketingModuleGetModulesBlocksPayload): MarketingModuleBlocks! @auth(roleNames: [ADMIN])
+    marketingModuleGetModuleBlockVersions(data: MarketingModuleGetModuleBlockVersionsPayload): MarketingModuleBlockVersions! @auth(roleNames: [ADMIN])
+
+    analyticsGetUsersData(data: AnalyticsGetUsersDataPayload): AnalyticsGetUsersDataResponse! @auth(roleNames: [ADMIN])
+}
+
+# mutations
+
+type Mutation {
+    userRegister(data: UserRegisterPayload!): UserLogined!
+    userLogin(data: UserLoginPayload!): UserLogined!
+    userLoginAs(data: UserLoginAsPayload!): UserLogined!
+    userLoginWithSocialProfile(data: UserLoginWithSocialProfilePayload!): UserLogined!
+    userResetPassword(data: UserResetPasswordPayload!): UserResetPasswordResponse
+    userResetPasswordConfirm(data: UserResetPasswordConfirmPayload!): UserResetPasswordConfirmResponse
+    userConfirmEmail(data: UserConfirmEmailPayload!): User!
+    userChangePassword(data: UserChangePasswordPayload!): UserChangePasswordResponse @auth
+    userSubscribeFreePackage(data: UserSubscribeFreePackagePayload!): User! @auth
+    userUpdateUser(data: UserUpdateUserPayload!): User! @auth(roleNames: [ADMIN])
+    userUpdateUserLogined(data: UserUpdateUserLoginedPayload!): User! @auth
+    userDeleteUsers(data: UserDeleteUsersPayload!): Void @auth(roleNames: [ADMIN])
+    userUpdateUsers(data: UserUpdateUsersPayload!): Void @auth(roleNames: [ADMIN])
+    userSendEmailConfirmation(data: UserSendEmailConfirmationPayload!): User! @auth
+
+    marketingModuleCreateModule(data: MarketingModuleUpdateModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
+    marketingModuleUpdateModule(data: MarketingModuleUpdateModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
+    marketingModuleDeleteModule(data: MarketingModuleDeleteModulePayload!): Void @auth(roleNames: [ADMIN])
+    marketingModuleUpdateModuleUser(data: MarketingModuleUpdateModuleUserPayload!): MarketingModuleUserModule! @auth
+    marketingModuleCreateModuleBlock(data: MarketingModuleUpdateModuleBlockPayload!): MarketingModuleBlock! @auth(roleNames: [ADMIN])
+    marketingModuleUpdateModuleBlock(data: MarketingModuleUpdateModuleBlockPayload!): MarketingModuleBlock! @auth(roleNames: [ADMIN])
+    marketingModuleDeleteModuleBlock(data: MarketingModuleDeleteModuleBlockPayload!): Void @auth(roleNames: [ADMIN])
+    marketingModuleUpdateModuleBlockUser(data: MarketingModuleUpdateModuleBlockUserPayload!): MarketingModuleUpdateModuleBlockUserResult! @auth
+    marketingModuleSyncModules(data: MarketingModuleSyncModulesPayload!): MarketingModuleSyncModulesResult! @auth(roleNames: [ADMIN])
+    marketingModuleUpdateModuleBlockVersion(data: MarketingModuleUpdateModuleBlockVersionPayload): MarketingModuleBlock! @auth(roleNames: [ADMIN])
+
+    paymentCreateStripeCustomerPortalSession(data: PaymentStripeCustomerPortalSessionPayload!): String! @auth
+    paymentCreateStripeCheckoutSession(data: PaymentStripeCheckoutSessionPayload!): String! @auth
+    paymentCreateStripeCheckoutSessionLifetime(data: PaymentStripeCheckoutSessionPayload!): String! @auth
+
+    fileDeleteFile(data: FileDeletePayload!): Void @auth
+    fileDeleteFileImage(data: FileDeletePayload!): Void @auth
+    fileDeleteFileVideo(data: FileDeletePayload!): Void @auth
+    fileCreateFilePdf(data: FileCreateFilePdfPayload!): FilePdf! @auth
+
+    reportTraceMessage(data: ReportTraceMessagePayload!): ReportTraceMessageResult @user
+}
+
+# user
+
+enum UserRole {
+    USER
+    ADMIN
+    TESTER_BIZBUILDER
+}
+
+enum UserSocialProfileProvider {
+    GOOGLE
+    FACEBOOK
+}
+
+enum UserOnboardingStatus {
+    INITIATED
+    FINISHED
+}
+
+enum UserEventType {
+    REGISTERED
+    SUBSCRIPTION_TRIAL_STARTED
+    SUBSCRIPTION_CREATED
+    SUBSCRIPTION_UPDATED
+    SUBSCRIPTION_DELETED
+    SESSION_COMPLETED
+    PACKAGE_CHANGED
+    INVOICE_PAID
+    INVOICE_FAILED
+    CHECKPOINT_APPROVAL_REQUESTED
+    CHECKPOINT_BRANDMASTER_APPROVED
+    CHECKPOINT_HARD_APPROVED
+    MARKETING_MODULE_FINISHED
+    BRANDMASTER_REQUESTED
+}
+
+type User {
+    id: ID!
+    isActive: Boolean!
+    email: String!
+    phone: String
+    firstName: String
+    lastName: String
+    referenceId: String
+    paymentPackage: PaymentPackage!
+    paymentPackagesAllowed: [PaymentPackage!]!
+    emailConfirmedAt: DateTime
+    emailConfirmNotifiedAt: DateTime
+    firstPromoterId: String
+    crmUserId: String
+    crmLocationId: String
+    hasSocialProfile: Boolean!
+    paymentIssue: PaymentIssue
+    subscription: PaymentStripeSubscription
+    roleNames: [UserRole!]!
+    stripeCustomerId: String
+    createdAt: DateTime
+    lastVisitedAt: DateTime
+}
+
+type UserLogined {
+    id: ID!
+    isActive: Boolean!
+    email: String!
+    phone: String
+    firstName: String
+    lastName: String
+    referenceId: String
+    paymentPackage: PaymentPackage!
+    paymentPackagesAllowed: [PaymentPackage!]!
+    emailConfirmedAt: DateTime
+    emailConfirmNotifiedAt: DateTime
+    firstPromoterId: String
+    crmUserId: String
+    crmLocationId: String
+    hasSocialProfile: Boolean!
+    paymentIssue: PaymentIssue
+    subscription: PaymentStripeSubscription
+    roleNames: [UserRole!]!
+    accessToken: String!
+    stripeCustomerId: String
+    createdAt: DateTime
+    lastVisitedAt: DateTime
+}
+
+type UserEvent {
+    id: ID!
+    createdAt: DateTime
+    type: UserEventType!
+    userAccount: User
+    data: JSON
+}
+
+type UserResetPasswordResponse {
+    email: String!
+}
+
+type UserResetPasswordConfirmResponse {
+    token: String!
+}
+
+type UserChangePasswordResponse {
+    password: String!
+}
+
+type Users {
+    count: Int!
+    data: [User!]!
+}
+
+type UserEvents {
+    count: Int!
+    data: [UserEvent!]!
+}
+
+type UsersEvents {
+    count: Int!
+    data: [UserEvent!]!
+}
+
+input UserUpdateUserPayload {
+    id: ID!
+    phone: String!
+    firstName: String!
+    lastName: String!
+    roleNames: [UserRole!]
+}
+
+input UserUpdateUserLoginedPayload {
+    firstName: String!
+    lastName: String!
+    email: String
+    phone: String
+}
+
+input UserDeleteUsersPayload {
+    ids: [ID]!
+}
+
+input UserUpdateUsersPayload {
+    ids: [ID]!
+    roleNames: [UserRole!]
+    roleAction: String
+}
+
+input UserSendEmailConfirmationPayload {
+    email: String
+}
+
+input UserRegisterPayload {
+    email: String!
+    phone: String
+    password: String!
+    selectedPackage: PaymentPackage!
+    firstName: String!
+    lastName: String!
+    referenceId: String!
+    reCaptcha: String!
+}
+
+input UserLoginPayload {
+    email: String!
+    password: String!
+    reCaptcha: String!
+    roles: [UserRole!]
+}
+
+input UserLoginAsPayload {
+    emailUser: String!
+    email: String!
+    password: String!
+    reCaptcha: String!
+}
+
+input UserLoginWithSocialProfilePayload {
+    authCode: String!
+    provider: UserSocialProfileProvider!
+    referenceId: String!
+    host: String!
+    roles: [UserRole!]
+}
+
+input UserResetPasswordPayload {
+    email: String!
+}
+
+input UserResetPasswordConfirmPayload {
+    password: String!
+    token: String!
+}
+
+input UserConfirmEmailPayload {
+    token: String!
+}
+
+input UserChangePasswordPayload {
+    oldPassword: String!
+    newPassword: String!
+}
+
+input UserGetUsersPayload {
+    pagination: PaginationPayload!
+    search: String
+    activeStatus: String
+    selectedPackage: PaymentPackage
+    role: UserRole
+}
+
+input UserGetUserEventsPayload {
+    pagination: PaginationPayload
+    id: ID!
+}
+
+input UserGetUsersEventsPayload {
+    pagination: PaginationPayload
+}
+
+input UserGetUserPayload {
+    id: ID!
+}
+
+input UserSubscribeFreePackagePayload {
+    selectedPackage: PaymentPackage!
+}
+
+# analytics
+type AnalyticsGetUsersDataResponse {
+    activeUsersCount: Int!
+    dailyActiveUsersCount: Int!
+    monthlyActiveUsers: Int!
+    paidUsers: Int!
+    monthlyRecurringRevenue: Int!
+    utmSources: String!
+    usersCount: Int!
+    uniqueUsers: Int!
+    newUsers: Int!
+    avgSessionTime: Int!
+}
+
+input AnalyticsGetUsersDataPayload {
+    startDate: String
+    endDate: String
+}
+
+# achievement
+
+enum AchievementType {
+    NONE
+    VISION_ALIGNMENT_NOT_LISTED
+    BRAND_ANTHEM_NOT_LISTED
+    TARGET_MARKET_NOT_LISTED
+    WEBSITE_NINJA
+    BRAND_BADASS
+    SOCIAL_MAVERICK
+    MEDIA_STAR
+    MARKETING_NERD
+    MARKETING_CADET
+    ALL_AROUND_PRO
+    MARKETING_SAGE
+    MARKETING_HERO
+    WORK_HORSE_5_NOT_LISTED
+    WORK_HORSE_10_NOT_LISTED
+    WORK_HORSE_15_NOT_LISTED
+    WORK_HORSE_20_NOT_LISTED
+    SOCIAL_BUTTERFLY
+    CONTENT_KING
+    CONVERSION_ALCHEMIST
+    MARKETING_MUSE
+    HEAVY_HITTER
+}
+
+type Achievement {
+    type: AchievementType!
+}
+
+interface AchievementResult {
+    achievements: [Achievement!]
+}
+
+# brand
+
+type BrandUser {
+    id: ID!
+    name: String
+    identifier: String
+    address: String
+    email: String
+    phone: String
+    websiteUrl: String
+    image: FileImage
+}
+
+# marketing-level
+
+type MarketingLevelUser {
+    id: ID!
+    category: MarketingModuleCategory!
+    points: Int!
+    level: Int!
+}
+
+type MarketingLevelsUser {
+    count: Int!
+    data: [MarketingLevelUser!]!
+}
+
+# marketing-module
+
+enum MarketingModuleUserStatus {
+    NEW
+    STARTED
+    FINISHED
+    POSTPONED
+}
+
+enum MarketingModuleUserCheckpointStatus {
+    PROGRESS
+    NOTIFICATION_PENDING
+    APPROVAL_PENDING
+    APPROVED
+    HARD_APPROVED
+}
+
+enum MarketingModuleUserStatusAction {
+    START
+    FINISH
+    SKIP
+    HIDE
+    CHECKPOINT_APPROVAL_NOTIFY
+    CHECKPOINT_APPROVE
+}
+
+enum MarketingModuleType {
+    CAMPAIGN
+    CHECKPOINT
+}
+
+enum MarketingModuleCategory {
+    MESSAGE
+    CONNECT
+    SYSTEMS
+    BUILD
+    OPTIMIZE
+    FOUNDATION
+    NONE
+}
+
+enum MarketingModuleAssignment {
+    DEFAULT
+    VAULT
+}
+
+enum MarketingModuleStatus {
+    PUBLISHED
+    DRAFT
+    TESTING
+}
+
+enum MarketingModuleBlockStatus {
+    PUBLISHED
+    DRAFT
+}
+
+enum MarketingModuleBlockType {
+    STEP
+    PAGE
+}
+
+enum MarketingModuleBlockUserStatus {
+    NEW
+    STARTED
+    FINISHED
+}
+
+enum MarketingModuleUserLogEvent {
+    CREATE
+    UPDATE
+}
+
+enum MarketingModuleBlockUserLogEvent {
+    PROGRESS
+    CREATE
+    UPDATE
+    AUTOSAVE
+}
+
+enum MarketingModuleSyncLogType {
+    ALL
+    ONE
+}
+
+enum MarketingModuleComponentKind {
+    DISPLAY
+    ENTRY
+}
+
+enum MarketingModuleComponentType {
+    InputText
+    TextArea
+    RadioGroup
+    RadioGroupAction
+    CheckboxGroup
+    SelectRange
+    TextSnippet
+    TextHighlighted
+    RowEntrySnippet
+    RowDisplaySnippet
+    ReminderSnippet
+    Toggle
+    FileUpload
+}
+
+type MarketingModule {
+    id: ID!
+    name: String!
+    description: String
+    requiredPackage: PaymentPackage
+    status: MarketingModuleStatus
+    isRequired: Boolean!
+    priority: Int
+    createdAt: Date!
+    updatedAt: Date!
+    category: MarketingModuleCategory!
+    type: MarketingModuleType!
+    blocks: [MarketingModuleBlock!]!
+    identifier: String!
+    code: String!
+    url: String
+    achievement: AchievementType
+    image: FileImage
+}
+
+type MarketingModuleUserModule {
+    id: ID!
+    name: String!
+    description: String
+    code: String
+    priority: Int
+    achievement: AchievementType
+    requiredPackage: PaymentPackage
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    status: MarketingModuleStatus
+    isRequired: Boolean!
+    identifier: String!
+    type: MarketingModuleType!
+    category: MarketingModuleCategory!
+    userModule: MarketingModuleUser
+    blocks: [MarketingModuleUserBlock!]!
+    image: FileImage
+    url: String
+    assignment: MarketingModuleAssignment
+}
+
+type MarketingModulesUser {
+    count: Int!
+    data: [MarketingModuleUser!]!
+}
+
+type MarketingModuleUserModules {
+    count: Int!
+    data: [MarketingModuleUserModule!]!
+}
+
+type MarketingModulesGetUserDataResult {
+    answers: JSON
+}
+
+type MarketingModuleBlock {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    name: String!
+    description: String
+    eta: Int!
+    points: Int!
+    code: String!
+    content: JSON
+    identifier: String!
+    priority: Int
+    status: MarketingModuleBlockStatus!
+    type: MarketingModuleBlockType!
+    marketingModule: MarketingModule
+    version: MarketingModuleBlockVersion
+}
+
+type MarketingModuleBlockVersion {
+    id: ID!
+    createdAt: DateTime!
+    updatedAt: Date!
+    name: String!
+    description: String
+    eta: Int!
+    points: Int!
+    code: String!
+    content: JSON
+    identifier: String!
+    priority: Int
+    status: MarketingModuleBlockStatus!
+    type: MarketingModuleBlockType!
+    marketingModuleId: Int!
+    marketingModuleBlockId: Int
+    number: Int
+    userAccount: User
+}
+
+type MarketingModuleBlockVersions {
+    data: [MarketingModuleBlockVersion]!
+    count: Int!
+}
+
+type MarketingModuleBlocks {
+    data: [MarketingModuleBlock]!
+    count: Int!
+}
+
+type MarketingModuleUpdateModuleBlockUserResult {
+    marketingModuleUserBlock: MarketingModuleUserBlock,
+    marketingModuleUserModule: MarketingModuleUserModule
+}
+
+type MarketingModuleUserBlock {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    name: String!
+    code: String!
+    description: String
+    eta: Int!
+    points: Int!
+    userBlock: MarketingModuleBlockUser
+    content: JSON
+    identifier: String!
+    priority: Int
+    status: MarketingModuleBlockStatus!
+}
+
+type MarketingModuleRoadmapModuleLightweight {
+    id: ID!
+    name: String!
+    shortDescription: String
+    category: MarketingModuleCategory!
+    type: MarketingModuleType!
+}
+
+type MarketingModuleUser {
+    id: ID!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    isBookmarked: Boolean!
+    isAvailable: Boolean!
+    approvedAccountId: Int
+    approvedAccount: User
+    approvedAt: DateTime
+    notifiedAt: DateTime
+    marketingModule: MarketingModule
+    status: MarketingModuleUserStatus!
+    userAccount: User
+}
+
+type MarketingModuleBlockUser {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    answers: JSON!
+    progress: Int!
+    status: MarketingModuleBlockUserStatus
+}
+
+type MarketingModules {
+    count: Int!
+    data: [MarketingModule!]!
+}
+
+type MarketingModuleSyncLog {
+    id: ID!
+    userAccount: User
+    createdAt: DateTime
+    type: MarketingModuleSyncLogType
+}
+
+type MarketingModuleSyncLogs {
+    count: Int!
+    data: [MarketingModuleSyncLog!]!
+}
+
+type MarketingModuleSyncModulesResult {
+    in: JSON
+    out: JSON
+    log: MarketingModuleSyncLog
+}
+
+input MarketingModuleSyncModulesPayload {
+    userAccountId: Int
+}
+
+input MarketingModuleUpdateModuleUserPayload {
+    statusAction: MarketingModuleUserStatusAction
+    approvedAccountEmail: String
+    isBookmarked: Boolean
+    id: ID!
+}
+
+input MarketingModuleGetModulesUserPayload {
+    pagination: PaginationPayload
+    category: MarketingModuleCategory
+    type: MarketingModuleType
+    status: MarketingModuleUserStatus
+    search: String
+}
+
+input MarketingModuleGetCheckpointsUserPayload {
+    pagination: PaginationPayload
+}
+
+input MarketingModuleGetModulesPayload {
+    pagination: PaginationPayload!
+    filterByType: MarketingModuleType
+}
+
+input MarketingModuleGetModulePayload {
+    marketingModuleId: ID!
+}
+
+input MarketingModuleUpdateModuleBlockUserAnswerPayload {
+    id: String!
+    answer: JSON!
+}
+
+input MarketingModuleUpdateModulePayload {
+    id: ID
+    name: String
+    identifier: String
+    code: String
+    description: String
+    category: MarketingModuleCategory
+    type: MarketingModuleType
+    priority: Int
+    isRequired: Boolean
+    requiredPackage: PaymentPackage
+    achievement: AchievementType
+    status: MarketingModuleStatus
+    fileImageId: Int
+}
+
+input MarketingModuleDeleteModulePayload {
+    id: ID
+}
+
+input MarketingModuleUpdateModuleBlockPayload {
+    id: ID
+    marketingModuleId: ID
+    name: String
+    identifier: String
+    code: String
+    description: String
+    eta: Int
+    points: Int
+    priority: Int
+    content: JSON
+    status: MarketingModuleBlockStatus
+}
+
+input MarketingModuleDeleteModuleBlockPayload {
+    id: ID
+}
+
+input MarketingModuleUpdateModuleBlockUserPayload {
+    answers: [MarketingModuleUpdateModuleBlockUserAnswerPayload!]
+    id: ID!
+    marketingModuleId: ID!
+    progress: Int
+    event: MarketingModuleBlockUserLogEvent
+    status: MarketingModuleBlockUserStatus
+}
+
+input MarketingModuleGetModuleUserPayload {
+    marketingModuleIdentifier: String
+    marketingModuleCode: String
+}
+
+input MarketingModuleGetModulesBlocksPayload {
+    search: String
+    componentType: String
+}
+
+input MarketingModuleGetModuleBlockVersionsPayload {
+    marketingModuleBlockId: Int
+    pagination: PaginationPayload
+}
+
+input MarketingModuleUpdateModuleBlockVersionPayload {
+    id: Int
+    versionId: Int
+}
+
+# document
+
+enum DocumentType {
+    BRAND_VAULT
+    BLUEPRINT
+}
+
+type DocumentContent {
+    content: JSON!
+    type: DocumentType!
+    identifier: String
+}
+
+type DocumentUser {
+    type: DocumentType!
+    shareId: String!
+    lastAccessTime: Date!
+}
+
+input DocumentGetDocumentContentPayload {
+    shareId: String
+}
+
+# file
+
+enum FileType {
+    IMAGE
+    FILE
+    EXCEL
+    VIDEO
+}
+
+enum FileConfigKey {
+    DEFAULT
+    BRAND_LOGO
+    MARKETING_MODULE_IMAGE
+    VIDEO
+}
+
+enum FileStatus {
+    CREATED,
+    PROGRESS,
+    SUCCESS,
+    FAILED,
+}
+
+type File {
+    id: Int!
+    name: String
+    guid: String!
+    filename: String!
+    url: String!
+    createdAt: Date!
+    size: Int!
+}
+
+type FileImage {
+    id: Int!
+    guid: String!
+    filename: String!
+    name: String
+    url: String!
+    createdAt: Date!
+    size: Int!
+    height: Int!
+    width: Int!
+}
+
+type FilePdf {
+    id: Int!
+    guid: String!
+    filename: String!
+    name: String
+    url: String!
+    createdAt: Date!
+    size: Int!
+}
+
+type FileVideo {
+    id: Int!
+    name: String
+    guid: String!
+    filename: String!
+    url: String!
+    createdAt: Date!
+    size: Int!
+}
+
+input FileDeletePayload {
+    id: Int!
+}
+
+input FileCreateFilePdfPayload {
+    html: String!
+    filename: String!
+}
+
+input IFileDeleteDeprecatedPayload {
+    url: String!
+}
+
+# report
+
+enum ReportTraceType {
+    CLIENT_ERROR
+    BACKEND_ERROR
+}
+
+input ReportTraceMessagePayload {
+    type: ReportTraceType!
+    message: String!
+    data: JSON
+}
+
+type ReportTraceMessageResult {
+    id: ID!
+}
+
+# payment
+
+enum PaymentIssue {
+    FAILED
+    ACTION_REQUIRED
+}
+
+enum PaymentPackage {
+    NONE
+    FREE
+    BIZBUILDER
+    BIZBUILDER_LIFETIME
+}
+
+type PaymentStripeSubscription {
+    id: ID!
+    userAcountId: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    status: String
+    productId: String!
+    priceId: String!
+    stripeId: String!
+    cancelAt: DateTime
+    canceledAt: DateTime
+    currentPeriodStart: DateTime
+    currentPeriodEnd: DateTime
+    trialStart: DateTime
+    trialEnd: DateTime
+    isActive: Boolean!
+}
+
+input PaymentStripeCheckoutSessionPayload {
+    selectedPackage: PaymentPackage!
+    isTrialing: Boolean
+    cancelUrl: String
+    successUrl: String
+}
+
+input PaymentStripeCustomerPortalSessionPayload {
+    returnUrl: String
+}
+
+# common
+
+input PaginationPayload {
+    pageSize: Int!
+    pageNumber: Int!
+    orderByColumn: String
+    orderByDirection: Order
+}
+
+enum Order {
+    ASC
+    DESC
+}
+
+enum ErrorCode {
+    USER_LOGIN_CREDENTIALS_NOT_RECOGNIZED
+    USER_EMAIL_WAS_NOT_FOUND
+    USER_EMAIL_ERROR
+    USER_ROLE_ERROR
+    USER_FIND_ERROR
+    USER_ACCESS_ERROR
+    USER_DEACTIVATED
+    USER_ALREADY_REGISTERED
+    USER_ALREADY_REGISTERED_WITH_SOCIAL
+    USER_RESET_PASSWORD_NOT_FOUND_OR_EXPIRED
+    USER_CHANGE_PASSWORD_ERROR
+    USER_CHANGE_PASSWORD_OLD_PASSWORD_INCORRECT
+    USER_CHANGE_PASSWORD_NEW_PASSWORD_INCORRECT
+    USER_SOCIAL_PROVIDER_NOT_ALLOWED
+    ENTITY_NOT_FOUND
+    AUTHENTICATION_TOKEN_REQUIRED
+    AUTHENTICATION_TOKEN_INVALID
+    AUTHENTICATION_UNATHORIZED_ACCESS
+    MARKETING_MODULE_WITH_IDENTIFIER_ALREADY_EXISTS
+    MARKETING_MODULE_WITH_CODE_ALREADY_EXISTS
+    MARKETING_MODULE_BLOCK_WITH_IDENTIFIER_ALREADY_EXISTS
+    MARKETING_MODULE_BLOCK_WITH_CODE_ALREADY_EXISTS
+    MARKETING_MODULE_WITH_NAME_ALREADY_EXISTS
+    MARKETING_MODULE_NO_ACCESS
+    PAYMENT_STRIPE_CLIENT_ID_NOT_FOUND
+    FILE_MAX_SIZE
+    FILE_MIN_SIZE
+    FILE_MIME_TYPE
+    FILE_IMAGE_MIME_TYPE
+    FILE_VIDEO_MIME_TYPE
+    FILE_IMAGE_WIDTH
+    FILE_IMAGE_HEIGHT
+    FILE_AWS_UPLOAD
+    FILE_AWS_DELETE
+    FILE_NON_USER
+    FILE_UPLOAD
+    FILE_NOT_FOUND
+    RECAPTCHA_ERROR
+}
+
+enum EnvironmentType {
+    LOCAL
+    PRODUCTION
+    DEVELOPMENT
+    STAGE
+    STAGE_PRODUCTION
+    TEST
+}
+
+scalar JSON
+scalar Void
+scalar Date
+scalar DateTime
+scalar Upload
+
