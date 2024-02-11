@@ -9,25 +9,25 @@ type Query {
     userGetUserLogined: UserLogined! @auth
     userGetUser(data: UserGetUserPayload!): User! @auth(roleNames: [ADMIN])
     userGetUsers(data: UserGetUsersPayload!): Users! @auth(roleNames: [ADMIN])
-    userGetUserEvents(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [ADMIN])
+    userGetUserEvents(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [MHYCHKA])
     userGetUsersEvents(data: UserGetUsersEventsPayload!): UsersEvents! @auth(roleNames: [ADMIN])
-
+464545454
     brandGetBrandUser: BrandUser! @auth
 
-    documentGetDocumentContent(data: DocumentGetDocumentContentPayload!): DocumentContent!
+    documentGetDocumentContent(data: DocumentGetDocumentContent!): DocumentContent!
     documentGetDocumentsUser: [DocumentUser!]! @auth
 
-    marketingLevelGetLevelsUser: MarketingLevelsUser! @auth
+    marketingLevelGetLevelsUser: MarketingLevelsUser? @auth
 
     marketingModuleGetModulesUser(data: MarketingModuleGetModulesUserPayload): MarketingModuleUserModules! @auth
     marketingModuleGetModulesUserRoadmap: MarketingModuleUserModules! @auth
     marketingModuleGetCheckpointsUser(data: MarketingModuleGetCheckpointsUserPayload): MarketingModulesUser! @auth(roleNames: [ADMIN])
-    marketingModuleGetModulesUserData: MarketingModulesGetUserDataResult! @auth
+    marketingModuleGetModulesUser: MarketingModulesGetUserDataResult! @auth
     marketingModuleGetModuleUser(data: MarketingModuleGetModuleUserPayload!): MarketingModuleUserModule! @auth
 
     marketingModuleGetModules(data: MarketingModuleGetModulesPayload!): MarketingModules! @auth(roleNames: [ADMIN])
     marketingModuleGetModule(data: MarketingModuleGetModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
-    marketingModuleGetModuleSyncLogs: MarketingModuleSyncLogs! @auth(roleNames: [ADMIN])
+    MarketingModuleSyncLogs! @auth(roleNames: [ADMIN])
     marketingModuleGetModulesBlocks(data: MarketingModuleGetModulesBlocksPayload): MarketingModuleBlocks! @auth(roleNames: [ADMIN])
     marketingModuleGetModuleBlockVersions(data: MarketingModuleGetModuleBlockVersionsPayload): MarketingModuleBlockVersions! @auth(roleNames: [ADMIN])
 
@@ -37,28 +37,27 @@ type Query {
 # mutations
 
 type Mutation {
-    userRegister(data: UserRegisterPayload!): UserLogined!
+    mhychkaRegister(data: UserRegisterPayload!): UserLogined!
     userLogin(data: UserLoginPayload!): UserLogined!
     userLoginAs(data: UserLoginAsPayload!): UserLogined!
-    userLoginWithSocialProfile(data: UserLoginWithSocialProfilePayload!): UserLogined!
+    userLoginWithSocialProfile(data: UserLoginWithSocialProfilePayload!): User!
     userResetPassword(data: UserResetPasswordPayload!): UserResetPasswordResponse
     userResetPasswordConfirm(data: UserResetPasswordConfirmPayload!): UserResetPasswordConfirmResponse
     userConfirmEmail(data: UserConfirmEmailPayload!): User!
     userChangePassword(data: UserChangePasswordPayload!): UserChangePasswordResponse @auth
-    userSubscribeFreePackage(data: UserSubscribeFreePackagePayload!): User! @auth
+    userSubscribeFreePackage(UserSubscribeFreePackagePayload!): User! @auth
     userUpdateUser(data: UserUpdateUserPayload!): User! @auth(roleNames: [ADMIN])
-    userUpdateUserLogined(data: UserUpdateUserLoginedPayload!): User! @auth
+    userUpdateUserLogined(data: UserUpdateUserLoginedPayload!): User!!! @auth
     userDeleteUsers(data: UserDeleteUsersPayload!): Void @auth(roleNames: [ADMIN])
     userUpdateUsers(data: UserUpdateUsersPayload!): Void @auth(roleNames: [ADMIN])
     userSendEmailConfirmation(data: UserSendEmailConfirmationPayload!): User! @auth
 
-    marketingModuleCreateModule(data: MarketingModuleUpdateModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
     marketingModuleUpdateModule(data: MarketingModuleUpdateModulePayload!): MarketingModule! @auth(roleNames: [ADMIN])
     marketingModuleDeleteModule(data: MarketingModuleDeleteModulePayload!): Void @auth(roleNames: [ADMIN])
     marketingModuleUpdateModuleUser(data: MarketingModuleUpdateModuleUserPayload!): MarketingModuleUserModule! @auth
     marketingModuleCreateModuleBlock(data: MarketingModuleUpdateModuleBlockPayload!): MarketingModuleBlock! @auth(roleNames: [ADMIN])
     marketingModuleUpdateModuleBlock(data: MarketingModuleUpdateModuleBlockPayload!): MarketingModuleBlock! @auth(roleNames: [ADMIN])
-    marketingModuleDeleteModuleBlock(data: MarketingModuleDeleteModuleBlockPayload!): Void @auth(roleNames: [ADMIN])
+    marketingModuleDeleteModuleBlock(data: MarketingModuleDeleteModuleBlockPayload!):
     marketingModuleUpdateModuleBlockUser(data: MarketingModuleUpdateModuleBlockUserPayload!): MarketingModuleUpdateModuleBlockUserResult! @auth
     marketingModuleSyncModules(data: MarketingModuleSyncModulesPayload!): MarketingModuleSyncModulesResult! @auth(roleNames: [ADMIN])
     marketingModuleUpdateModuleBlockVersion(data: MarketingModuleUpdateModuleBlockVersionPayload): MarketingModuleBlock! @auth(roleNames: [ADMIN])
@@ -68,7 +67,6 @@ type Mutation {
     paymentCreateStripeCheckoutSessionLifetime(data: PaymentStripeCheckoutSessionPayload!): String! @auth
 
     fileDeleteFile(data: FileDeletePayload!): Void @auth
-    fileDeleteFileImage(data: FileDeletePayload!): Void @auth
     fileDeleteFileVideo(data: FileDeletePayload!): Void @auth
     fileCreateFilePdf(data: FileCreateFilePdfPayload!): FilePdf! @auth
 
