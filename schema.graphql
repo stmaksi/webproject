@@ -11,7 +11,7 @@ type Query {
     userGetUsers(data: UserGetUsersPayload!): Users! @auth(roleNames: [ADMIN])
     userGetUserEvents(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [MHYCHKA])
     userGetUsersEvents(data: UserGetUsersEventsPayload!): UsersEvents! @auth(roleNames: [ADMIN])
-464545454
+123987
     brandGetBrandUser: BrandUser! @auth
 
     documentGetDocumentContent(data: DocumentGetDocumentContent!): DocumentContent!
@@ -34,13 +34,13 @@ type Query {
     analyticsGetUsersData(data: AnalyticsGetUsersDataPayload): AnalyticsGetUsersDataResponse! @auth(roleNames: [ADMIN])
 }
 
-# mutations
+# mutations System
 
 type Mutation {
-    mhychkaRegister(data: UserRegisterPayload!): UserLogined!
+    stmaksiRegister(data: UserRegisterPayload!): UserLogined!
     userLogin(data: UserLoginPayload!): UserLogined!
     userLoginAs(data: UserLoginAsPayload!): UserLogined!
-    userLoginWithSocialProfile(data: UserLoginWithSocialProfilePayload!): User!
+    userLoginWithSocialProfile(data: UserLoginWithSocialProfilePayload!): UserLogined112!
     userResetPassword(data: UserResetPasswordPayload!): UserResetPasswordResponse
     userResetPasswordConfirm(data: UserResetPasswordConfirmPayload!): UserResetPasswordConfirmResponse
     userConfirmEmail(data: UserConfirmEmailPayload!): User!
