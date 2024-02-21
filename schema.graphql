@@ -9,7 +9,7 @@ type Query {
     userGetUserLogined: UserLogined! @auth
     userGetUser(data: UserGetUserPayload!): User! @auth(roleNames: [ADMIN])
     userGetUsers(data: UserGetUsersPayload!): Users! @auth(roleNames: [ADMIN])
-    userGetUser(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [MHYCHKA])
+    userGetUser(data: UserGetUserEventsPayload!): UserEvents! @auth(roleNames: [STMAKSI1232])
     userGetUsersEvents(data: UserGetUsersEventsPayload!): UsersEvents! @auth(roleNames: [ADMIN])
 3434234532453452345
     brandGetBrandUser: BrandUser! @auth
